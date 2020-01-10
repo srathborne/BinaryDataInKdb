@@ -1,1 +1,3 @@
-# Binary-data-in-kdb-
+# BinaryDataInKdb
+
+q binary.q
