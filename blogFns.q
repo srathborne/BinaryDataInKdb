@@ -1,6 +1,6 @@
 / Read data in with read1 as a list of bytes
 loadData:{[file]
-    `filename`extension`viewer`data!(`$1_first fn;`$last fn:"." vs string[file];"c"$data;data:read1 file)
+    `filename`extension`kdbViewer`filepath`data!(`$1_first fn;`$last fn:"." vs string[file];"c"$data;"http://localhost:8000/",1_string file;data:read1 file)
  }
 
 / Save data into two tables, compressesd and uncompressed 

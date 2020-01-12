@@ -13,17 +13,29 @@ htmlTab:{[tab]
  }
 
 / encode binary data into base 64 (h5 compatible)
-encodeImg:{""sv("<img src='data:image/jpeg;base64,";.Q.btoa x;"'/>")}
+encodeImg:{""sv("<img width='320' height='240' src='data:image/jpeg;base64,";.Q.btoa x;"'/>")}
 encodeAudio:{""sv("<audio controls src='data:audio/ogg;base64,";.Q.btoa x;"'/>")}
 encodePdf:{""sv ("<embed src='data:application/pdf;base64,"; .Q.btoa x; "'/>")}
-encodeVideo:{[x;y] "" sv ("<video width='320' height='240' controls> <source type='video/"; x; "' src='data:video/"; x:string x; ";base64,"; .Q.btoa y; "'/></video>")}
+encodeVideo:{[x;y] "" sv ("<video controls width='320' height='240' source type='video/"; x; "' src='data:video/"; x:string x; ";base64,"; .Q.btoa y; "'/></video>")}
+encodeMap:`jpeg`jpg`png`oga`wav`pdf!(encodeImg;encodeImg;encodeImg;encodeAudio;encodeAudio;encodePdf)
+
 encodeDownload:{[x;y;z] ""sv("<a download=";raze("'";string` sv(y;z);"'");" href='data:image.jpeg;base64,";.Q.btoa x;"'/> downloadFile")}
 
-functionMap:`jpeg`jpg`png`oga`wav`pdf!(encodeImg;encodeImg;encodeImg;encodeAudio;encodeAudio;encodePdf)
+/ tag url filepaths
+tagRef:{""sv ("<embed width='320' height='=240' src='"; x; "'/>")}
+tagCsv:{""sv ("<object type='text/plain' width='320' height='=240' data='"; x; "'/>")}
+tagVideoRef:{""sv ("<video controls width='320' height='=240' src='";x;"'/>")}
+tagAudioRef:{""sv("<audio controls src='";x;"'/>")}
+tagMap:`jpeg`jpg`png`txt`pdf`csv`oga`wav`mp4`flv`webm!(tagRef;tagRef;tagRef;tagRef;tagRef;tagRef;tagAudioRef;tagAudioRef;tagVideoRef;tagVideoRef;tagVideoRef)
+tagDownload:{""sv("<a download href='";x;"'/> downloadFile")}
 
 encodeData:{[tab]
-    tab:update viewer:functionMap[extension]@'data from tab where extension in key functionMap;
-    tab:update viewer:encodeVideo'[extension;data] from tab where extension in `mp4`flv`webm;
-    tab:update download:encodeDownload'[data;filename;extension] from tab;
-    tab
+    tab:update kdbViewer:encodeMap[extension]@'data from tab where extension in key encodeMap;
+    tab:update kdbViewer:encodeVideo'[extension;data] from tab where extension in `mp4`flv`webm;
+    tab:update kdbDownload:encodeDownload'[data;filename;extension] from tab;
+
+    tab:update filepathDwn:tagDownload each filepath from tab;
+    tab:update filepath:tagMap[extension]@'filepath from tab where extension in key tagMap;
+
+    `filename`extension`kdbViewer`kdbDownload`filepath`filepathDwn xcols tab
  }
